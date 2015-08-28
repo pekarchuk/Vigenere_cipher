@@ -1,23 +1,22 @@
 #! /usr/bin/python3.3
 # -*- encoding: utf-8 -*-
 
+alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
+# alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-def prepare_text(z):
+
+def prepare_text(filename):
     """Deletes all non-alphabet symbols from text"""
-    alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-    # alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    with open(filename, 'r', encoding='utf-8') as f:
+        z = f.read()
     z = list(' '.join(z.upper().split()))
-    for i, k in enumerate(z):
-        if k not in alphabet:
-            z[i] = ''
+    z = [x for x in z if x in alphabet]
     return ''.join(z)
 
 
 def encode(plaintext, key):
     """Vigenere cipher, returns CT"""
-    alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-    # alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    result = []
+    result = list()
     for i, k in enumerate(plaintext):
         sym_index = alphabet.find(k)
         key_index = alphabet.find(key[i % len(key)])
@@ -28,8 +27,6 @@ def encode(plaintext, key):
 
 def decode(CT, key):
     """Decoding Vigenere, returns PT"""
-    alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-    # alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     result = []
     for i, k in enumerate(CT):
         sym_index = alphabet.find(k)
@@ -41,8 +38,6 @@ def decode(CT, key):
 
 def index(CT):
     """Returns matching index of text"""
-    alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
-    # alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     N = (CT.count(t) * (CT.count(t) - 1) for t in alphabet)
     I = sum(N) / (len(CT) * (len(CT) - 1))
     return round(I, 5)
@@ -113,8 +108,6 @@ def char_frequency(check_string):
 
 def decipher(CT):
     """Deciphering of Vigenere cipher (work function for long keys)"""
-    # alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 
     # most frequent chars
     freq_english = "ETAINOSHRDLUCMFWYGPBVKQJXZ"
@@ -158,17 +151,17 @@ def main():
     """_____ lab 1: Vigenere cipher _____"""
     key = "ЭКОМАЯТНИКФУКО"
 
-    # if reading plaintext from file
-    with open('plaintext.txt', 'r', encoding='utf-8') as f:
-        PT = f.read()
-    PT = prepare_text(PT)
+    # reading plaintext from file
+    filename = 'plaintext.txt'
+    PT = prepare_text(filename)
 
     # Test for encoding
-    # CT = encode(PT, key)
-    CT = decode(PT, key)
-    print(CT)
+    CT = encode(PT, key)
+    # CT = decode(PT, key)
+    # print(CT)
+    decipher(CT)
 
-    # Test for fining key length (for shorn ones)
+    # Test for finding key length (for shorn ones)
     # print(find_small_key_length(CT))
     # print(index(CT))
     # print(matches_dict_func(CT))
