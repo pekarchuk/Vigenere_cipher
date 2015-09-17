@@ -1,5 +1,8 @@
 #! /usr/bin/python3.3
 # -*- encoding: utf-8 -*-
+from operator import itemgetter
+import collections
+
 
 alphabet = "АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 # alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -54,7 +57,7 @@ def find_small_key_length(CT):
         Ir_arr = [index(e) for e in y_r]
         res = round(sum(Ir_arr) / len(Ir_arr), 5)
         diff[r] = round(abs(text_index_ru - res), 3)
-        print('r =', r, 'index =', res, 'mod =', round(abs(text_index_ru - res), 3))
+        print("r={}, index={}, mod={}".format(r, res, round(abs(text_index_ru - res), 3)))
     return min(diff, key=diff.get)
 
 
@@ -67,7 +70,7 @@ def matches_bigram_start(ciphertext):
     """Analysing bigrams frequency in text, returns [('MB', (38, 2))] in descending order"""
     bigrams_count_dict = dict()
     bigram_new = dict()
-    bigrams = [ciphertext[i:i + 2] for i in range(0, len(ciphertext), 2)]
+    bigrams = [ciphertext[i:i + 2] for i in range(len(ciphertext), 2)]
     for e in set(bigrams):
         if bigrams.count(e) != 1:
             bigrams_count_dict[e] = [bigrams.count(e)]
@@ -81,29 +84,23 @@ def matches_bigram_start(ciphertext):
 
 def matches_stat(ciphertext, r):
     """Finds letter matches on k-distance, returns number_of_matches"""
-    return sum((1 if x == ciphertext[k + r] else 0 for k, x in enumerate(ciphertext[:-r])))
+    return sum(int(x == ciphertext[k + r]) for k, x in enumerate(ciphertext[:-r]))
 
 
 def matches_dict_func(ciphertext, k):
     """ Finds letter matches on k-distance, returns paird (distanse, number_of_matches) in descending order"""
     matches_dict = [(x, matches_stat(ciphertext, x)) for x in range(6, k + 1)]
-    return sorted(matches_dict, key=lambda x: (-x[1], x[0]))
+    return sorted(matches_dict, key=itemgetter(1), reverse=True)
 
 
 def find_key_length(match_d):
     """Returns item with max value in dictioinary"""
-    return max(match_d, key=lambda x: x[-1])
+    return max(match_d, key=itemgetter(1))
 
 
 def char_frequency(check_string):
-    """ Frequency analysis, returns frequency of letters in descending order """
-    res_dict = dict()
-    for s in check_string:
-        if s in res_dict:
-            res_dict[s] += 1
-        else:
-            res_dict[s] = 1
-    return sorted(res_dict.items(), key=lambda x: (-x[1], x[0]))
+    """Frequency analysis, returns frequency of letters in descending order """
+    return sorted(collections.Counter(check_string).items(), key=itemgetter(1), reverse=True)
 
 
 def decipher(CT):
